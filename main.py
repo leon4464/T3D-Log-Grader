@@ -120,13 +120,24 @@ def calculateHandledAircraft(logged_instructions, GA_departures, GA_arrivals, de
 
 # Configuration
 # Change as needed depending on Tower!3D Pro version and tournament conditions
-terminal_synonyms = ["TERMINAL", "RAMP", "APRON"] # possible names for taxiing to final spot
-banned_runways = ["24R"] # list of runways disallowed for departure / arrivals
-arrivalairportcode = "LAX" # airport code without kilo
-airlines_filename = "klax_airlines.txt" 
-GA_filename = "klax_gaandlocaltraffic.txt"
-commercial_filename = "klax_schedule.txt"
-gamelog_filename = "output_log.txt"
+print("For the next inputs, you can give 0, 1 or more answers. Enter one at a time, and press enter to confirm your choice.")
+terminal_synonyms = ["TERMINAL"]
+inp = input("Enter one synonyms for TERMINAL (or nothing if not applicable): ")
+while inp != "":
+    terminal_synonyms.append(inp)
+    inp = input("Enter one synonym for TERMINAL (or nothing if not applicable): ")
+
+banned_runways = []
+inp = input("Enter all banned runways (or none if not applicable): ")
+while inp != "":
+    banned_runways.append(inp)
+    inp = input("Enter all banned runways (or none if not applicable): ")
+
+arrivalairportcode = input("Enter the airport code (ex. LAX): ") # airport code without kilo
+airlines_filename = input("Enter the airlines filename (ex. klax_airlines.txt): ")
+GA_filename = input("Enter the GA schedule filename (ex. klax_gaandlocaltraffic.txt): ")
+commercial_filename = input("Enter commercial schedule filename (ex. klax_schedule.txt): ")
+gamelog_filename = input("Enter the gamelog filename (ex. output_log.txt): ")
 
 # Importing Airline Data as a dictionary (Tower!3D Pro encodes AAL as AA for example for American Airlines)
 # Usage: "AA" key (weird game format) / index will return "AAL" (ICAO)
