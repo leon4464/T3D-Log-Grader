@@ -6,6 +6,7 @@ This Python script allows you to grade logs of Tower 3D! Pro sessions. This is i
 - Provides a *score report* useful in determining a final score for a competition
 - This report analyses a provided schedule and a log to determine how many flights needed to be handled, and how many were handled
 - Allows you to ban runways from being used (they won't be counted as a valid departure / arrival if they are "banned").
+- Compatible with Eligrim's tower3d.rec mod by default (although this is untested)
 - The use of this app is not intended as standalone - you should also collect time & score in the form of a screenshot from the host
 > In theory, a user could issue a landing & taxi clearance while a plane is in the air - and the program would consider it a "handled" arrival - so it is recommended to use this alongside a screenshot of the points (so you can be sure everything was properly handled). 
 
@@ -13,13 +14,38 @@ This Python script allows you to grade logs of Tower 3D! Pro sessions. This is i
 
 # Usage and requirements
 - Adapt script as needed
-- Use python 3.9.13 or later
+- Use Python 3.9.13 or later
 ## Move the following to the same directory as the main script
 - The output_log.txt created after a (single or multiplayer) session of Tower!3D Pro (latest version as of 13.07.2022 is supported) in the same directory as the script
 - The schedule files for general aviation and commercial aircraft (ie *klax_gaandlocaltraffic.txt* and *klax_schedule.txt*) in the same directory as the script
 - The airlines file (ie *klax_airlines.txt*) in the same directory as the script
+- By default the script will output something like:
 
-# Known issues 
+```
+Runtime Results - 01:19:51
+Terminal Synonyms: ['TERMINAL', 'RAMP', 'APRON']
+Banned Runways: ['24R']
+Airport Code: LAX
+Files used: klax_airlines.txt, klax_gaandlocaltraffic.txt, klax_schedule.txt, output_log.txt
+
+# Airline Traffic Statistics
+Expected departures: 60 (58 handled)
+Expected arrivals: 66 (66 handled)
+
+# GA Traffic Statistics
+Expected departures: 0 (0 handled)
+Expected arrivals: 0 (0 handled)
+
+Total Runtime (ms): 16.995
+
+Press enter to proceed view planes not considered handled...
+
+{'Callsign': 'ITY6142', 'Type': 'departure', 'Pushback': True, 'Taxi': False, 'Takeoff': False, 'Handoff': False, 'Landing': None}
+{'Callsign': 'SWA1004', 'Type': 'departure', 'Pushback': False, 'Taxi': True, 'Takeoff': False, 'Handoff': False, 'Landing': None}
+```
+
+# Known issues
+- [ ] Implementation of GA aircraft is **not yet implemented**
 - [ ] Inefficiencies in the code (checking a potentially invalid departure / arrival multiple times).
 - [ ] GA aircraft haven't been fully and may be counted incorrectly.
 - [ ] A user could, theoretically just despawn aircraft after they have issued taxi clearance to the gate. There isn't a simple or elegant way to check that an aircraft has actually made it to the gate and "naturally" despawned.
