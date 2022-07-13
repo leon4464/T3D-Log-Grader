@@ -195,3 +195,7 @@ print()
 
 for i in range(0, len(unhandled)):
     print(unhandled[i])
+
+print()
+print("Execution has finished. Script will auto-close in 60 seconds...")
+time.sleep(60)
