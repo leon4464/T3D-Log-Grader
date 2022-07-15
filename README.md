@@ -22,11 +22,13 @@ This Python script allows you to grade logs of Tower 3D! Pro sessions. This is i
 - By default the script will output something like:
 
 ```
-Runtime Results - 01:19:51
+Runtime Results - 23:41:46
 Terminal Synonyms: ['TERMINAL', 'RAMP', 'APRON']
 Banned Runways: ['24R']
 Airport Code: LAX
 Files used: klax_airlines.txt, klax_gaandlocaltraffic.txt, klax_schedule.txt, output_log.txt
+
+Please Note: For the runway usage statistics, only the first clearance is measured for each plane.
 
 # Airline Traffic Statistics
 Expected departures: 60 (58 handled)
@@ -36,12 +38,18 @@ Expected arrivals: 66 (66 handled)
 Expected departures: 0 (0 handled)
 Expected arrivals: 0 (0 handled)
 
-Total Runtime (ms): 16.995
+Total Runtime (ms): 16.003
 
-Press enter to proceed view planes not considered handled...
+Press enter to view planes not considered handled...
 
-{'Callsign': 'ITY6142', 'Type': 'departure', 'Pushback': True, 'Taxi': False, 'Takeoff': False, 'Handoff': False, 'Landing': None}
-{'Callsign': 'SWA1004', 'Type': 'departure', 'Pushback': False, 'Taxi': True, 'Takeoff': False, 'Handoff': False, 'Landing': None}
+{'Callsign': 'ITY621', 'Type': 'departure', 'Pushback': True, 'Taxi': False, 'Takeoff': False, 'Handoff': False, 'Landing': None}
+{'Callsign': 'SWA1904', 'Type': 'departure', 'Pushback': False, 'Taxi': True, 'Takeoff': False, 'Handoff': False, 'Landing': None}
+
+Press enter to view runway usage stats (by valid / counted clearances)...
+
+# Runway Usage Statistics (number of flights which were assigned the runway / total handled)
+Commercial - departures: RWY25R - 32/58 (55.172%) RWY24L - 26/58 (44.827%)
+Commercial - arrivals: RWY24R - 37/66 (56.060%) RWY25R - 29/66 (43.939%)
 ```
 
 # Known issues
