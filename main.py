@@ -55,6 +55,11 @@ def importGameLog(filename):
     return logged_instructions
 
 def calculateHandledAircraft(logged_instructions, GA_departures, GA_arrivals, departures, arrivals, airlines, terminal_synonyms, banned_runways):
+    GA_departure_stats = {}
+    GA_arrival_stats = {}
+    departure_stats = {}
+    arrival_stats = {}
+
     unhandled = []
     # GA processing needs review! Currently can't test GA as I don't have any GA schedules
     GA_departure_count = 0
@@ -78,10 +83,23 @@ def calculateHandledAircraft(logged_instructions, GA_departures, GA_arrivals, de
             if target_callsign in logged_instructions[j][0]:
                 # check if current instruction is a VALID takeoff clearance
                 if len(logged_instructions[j]) >= 6 and ("TAKEOFF" in logged_instructions[j][5] or "TAKEOFF" in logged_instructions[j][-1]) and logged_instructions[j][2] not in banned_runways:
+                    # to avoid takeoffs being counted twice for one plane, only the first is counted (the first makes takeoff True)
+                    if takeoff == False:
+                        runway_used = logged_instructions[j][2][0:3] # returns runway name ie 25R, without sometimes present \n
+                        # check if runway already is in the stats
+                        alreadyExists = False
+                        for i in departure_stats.keys():
+                            if runway_used == i:
+                                alreadyExists = True
+                        if alreadyExists == True:
+                            departure_stats[runway_used] += 1
+                        else:
+                            departure_stats[runway_used] = 1
                     takeoff = True
                     # handles handoff check for all handoffs at the end of messages
                     if "DEPARTURE" in logged_instructions[j][-1]:
                         handoff = True
+
                 # check if current instruction is a pushback clearance
                 elif len(logged_instructions[j]) >= 6 and "PUSHBACK" in logged_instructions[j][1]:
                     pushback = True
@@ -107,6 +125,18 @@ def calculateHandledAircraft(logged_instructions, GA_departures, GA_arrivals, de
             # departure as a subcheck
             if target_callsign in logged_instructions[j][0]:
                 if len(logged_instructions[j]) >= 6 and "LAND" in logged_instructions[j][5]:
+                    # to avoid landings being counted twice for one plane, only the first is counted (the first makes landings True)
+                    if landing == False:
+                        runway_used = logged_instructions[j][2][0:3] # returns runway name ie 25R, without sometimes present \n
+                        # check if runway already is in the stats
+                        alreadyExists = False
+                        for i in arrival_stats.keys():
+                            if runway_used == i:
+                                alreadyExists = True
+                        if alreadyExists == True:
+                            arrival_stats[runway_used] += 1
+                        else:
+                            arrival_stats[runway_used] = 1
                     landing = True
                 elif len(logged_instructions[j]) >= 4 and logged_instructions[j][3] in terminal_synonyms:
                     taxi = True
@@ -116,7 +146,7 @@ def calculateHandledAircraft(logged_instructions, GA_departures, GA_arrivals, de
         else:
             unhandled.append({"Callsign": target_callsign, "Type": "arrival", "Pushback": None, "Taxi": taxi, "Takeoff": None, "Handoff": None, "Landing": landing})
     
-    return GA_departure_count, GA_arrival_count, departure_count, arrival_count, unhandled
+    return GA_departure_count, GA_arrival_count, departure_count, arrival_count, unhandled, GA_departure_stats, GA_arrival_stats, departure_stats, arrival_stats 
 
 # Configuration
 # Change as needed depending on Tower!3D Pro version and tournament conditions
@@ -157,6 +187,10 @@ GA_arrivals_handled = handled_aircraft[1]
 departures_handled = handled_aircraft[2]
 arrivals_handled = handled_aircraft[3]
 unhandled = handled_aircraft[4]
+GA_departure_stats = handled_aircraft[5]
+GA_arrival_stats = handled_aircraft[6]
+departure_stats = handled_aircraft[7]
+arrival_stats = handled_aircraft[8]
 
 print()
 print("Runtime Results - " + time.strftime("%H:%M:%S"))
@@ -164,6 +198,9 @@ print("Terminal Synonyms: " + str(terminal_synonyms))
 print("Banned Runways: " + str(banned_runways))
 print("Airport Code: " + arrivalairportcode)
 print("Files used: " + airlines_filename + ", " + GA_filename + ", " + commercial_filename + ", " + gamelog_filename)
+print()
+
+print("Please Note: For the runway usage statistics, only the first clearance is measured for each plane.")
 print()
 
 print("# Airline Traffic Statistics")
@@ -179,8 +216,35 @@ print()
 print("Total Runtime (ms): " + str((time.time() - initialtime) * 1000)[:6])
 print()
 
-input("Press enter to proceed view planes not considered handled... ")
+input("Press enter to view planes not considered handled... ")
 print()
 
 for i in range(0, len(unhandled)):
     print(unhandled[i])
+print()
+
+input("Press enter to view runway usage stats (by valid / counted clearances)... ")
+print()
+
+def getDictKeysList(dict):
+    # somewhat dodgy way of getting the keys of a dict as a list
+    keysList = str(dict.keys())[11:-2].split(", ")
+    for i in range(0, len(keysList)):
+        keysList[i] = keysList[i].replace("'", "")
+    return keysList
+
+print("# Runway Usage Statistics (number of flights which were assigned the runway / total handled)")
+
+departure_message = "Commercial - departures: "
+departure_runwaykeys = getDictKeysList(departure_stats)
+for i in range(0, len(departure_runwaykeys)):
+    departure_message += "RWY" + departure_runwaykeys[i] + " - " + str(departure_stats[departure_runwaykeys[i]]) + "/" + str(departures_handled) + " (" + str((departure_stats[departure_runwaykeys[i]]/departures_handled)*100)[0:6] + "%) "
+
+print(departure_message)
+
+arrival_message = "Commercial - arrivals: "
+arrival_runwaykeys = getDictKeysList(arrival_stats)
+for i in range(0, len(arrival_runwaykeys)):
+    arrival_message += "RWY" + arrival_runwaykeys[i] + " - " + str(arrival_stats[arrival_runwaykeys[i]]) + "/" + str(arrivals_handled) + " (" + str((arrival_stats[arrival_runwaykeys[i]]/arrivals_handled)*100)[0:6] + "%) "
+
+print(arrival_message)
