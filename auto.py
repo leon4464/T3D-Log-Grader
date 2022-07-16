@@ -164,7 +164,6 @@ def calculateHandledAircraft(logged_instructions, GA_departures, GA_arrivals, de
     return GA_departure_count, GA_arrival_count, departure_count, arrival_count, unhandled, GA_departure_stats, GA_arrival_stats, departure_stats, arrival_stats, go_arounds
 
 if __name__ == "__main__":
-        
     # Configuration
     # Change as needed depending on Tower!3D Pro version and tournament conditions
     terminal_synonyms = ["TERMINAL", "RAMP", "APRON"] # possible names for taxiing to final spot
@@ -174,6 +173,8 @@ if __name__ == "__main__":
     GA_filename = "klax_gaandlocaltraffic.txt"
     commercial_filename = "klax_schedule.txt"
     gamelog_filename = "output_log.txt"
+    teamname = "default"
+    output_file = open(teamname + "-" + arrivalairportcode + "-auto.log", "x")
 
     # Importing Airline Data as a dictionary (Tower!3D Pro encodes AAL as AA for example for American Airlines)
     # Usage: "AA" key (weird game format) / index will return "AAL" (ICAO)
@@ -211,39 +212,35 @@ if __name__ == "__main__":
     arrival_stats = handled_aircraft[8]
     go_arounds = handled_aircraft[9]
 
-    print()
-    print("Runtime Results - " + time.strftime("%H:%M:%S"))
-    print("Terminal Synonyms: " + str(terminal_synonyms))
-    print("Banned Runways: " + str(banned_runways))
-    print("Airport Code: " + arrivalairportcode)
-    print("Files used: " + airlines_filename + ", " + GA_filename + ", " + commercial_filename + ", " + gamelog_filename)
-    print()
+    output_file.write("Runtime Results - autograder - " +  time.strftime("%H:%M:%S") + "\n")
+    output_file.write("\n")
 
-    print("Please Note: For the runway usage statistics, only the first clearance is measured for each plane.")
-    print()
+    output_file.write("# Configuration\n")
+    
+    output_file.write("Terminal Synonyms: " + str(terminal_synonyms)+ "\n")
+    output_file.write("Banned Runways: " + str(banned_runways)+ "\n")
+    output_file.write("Airport Code: " + arrivalairportcode + "\n")
+    output_file.write("Files used: " + airlines_filename + ", " + GA_filename + ", " + commercial_filename + ", " + gamelog_filename + "\n")
+    output_file.write("\n")
 
-    print("# Airline Traffic Statistics")
-    print("Expected departures: " + str(departure_count) + " (" + str(departures_handled) + " handled)")
-    print("Expected arrivals: " + str(arrival_count) + " (" + str(arrivals_handled) + " handled)")
-    print()
+    output_file.write("Please Note: For the runway usage statistics, only the first clearance is measured for each plane and only allowed runways are counted\n")
+    output_file.write("\n")
 
-    print("# GA Traffic Statistics")
-    print("Expected departures: " + str(GA_departure_count) + " (" + str(GA_departures_handled) + " handled)")
-    print("Expected arrivals: " + str(GA_arrival_count) + " (" + str(GA_arrivals_handled) + " handled)")
-    print()
+    output_file.write("# Airline Traffic Statistics\n")
+    output_file.write("Expected departures: " + str(departure_count) + " (" + str(departures_handled) + " handled)\n")
+    output_file.write("Expected arrivals: " + str(arrival_count) + " (" + str(arrivals_handled) + " handled)\n")
+    output_file.write("\n")
 
-    print("Total Runtime (ms): " + str((time.time() - initialtime) * 1000)[:6])
-    print()
+    output_file.write("# GA Traffic Statistics\n")
+    output_file.write("Expected departures: " + str(GA_departure_count) + " (" + str(GA_departures_handled) + " handled)\n")
+    output_file.write("Expected arrivals: " + str(GA_arrival_count) + " (" + str(GA_arrivals_handled) + " handled)\n")
+    output_file.write("\n")
 
-    input("Press enter to view planes not considered handled... ")
-    print()
+    output_file.write("# Unhandled planes\n")
 
     for i in range(0, len(unhandled)):
-        print(unhandled[i])
-    print()
-
-    input("Press enter to view runway usage stats (by valid / counted clearances)... ")
-    print()
+        output_file.write(str(unhandled[i]) + "\n")
+    output_file.write("\n")
 
     def getDictKeysList(dict):
         # somewhat dodgy way of getting the keys of a dict as a list
@@ -252,7 +249,7 @@ if __name__ == "__main__":
             keysList[i] = keysList[i].replace("'", "")
         return keysList
 
-    print("# Runway Usage Statistics (number of flights which were assigned the runway / total handled)")
+    output_file.write("# Runway Usage Statistics (number of flights which were assigned the runway / total handled)\n")
 
     departure_message = "Commercial - departures: "
     departure_runwaykeys = getDictKeysList(departure_stats)
@@ -261,7 +258,7 @@ if __name__ == "__main__":
         departure_message += "RWY" + departure_runwaykeys[i] + " - " + str(departure_stats[departure_runwaykeys[i]]) + "/" + str(departure_count) + " (" + str((departure_stats[departure_runwaykeys[i]]/departure_count)*100)[0:6] + "%) "
         remainder -= int(departure_stats[departure_runwaykeys[i]])
     departure_message += "Unhandled: " + str(remainder) + " (" + str(remainder / departure_count)[0:6] + "%)"
-    print(departure_message)
+    output_file.write(departure_message + "\n")
 
     arrival_message = "Commercial - arrivals: "
     arrival_runwaykeys = getDictKeysList(arrival_stats)
@@ -270,10 +267,12 @@ if __name__ == "__main__":
         arrival_message += "RWY" + arrival_runwaykeys[i] + " - " + str(arrival_stats[arrival_runwaykeys[i]]) + "/" + str(arrival_count) + " (" + str((arrival_stats[arrival_runwaykeys[i]]/arrival_count)*100)[0:6] + "%) "
         remainder -= int(arrival_stats[arrival_runwaykeys[i]])
     arrival_message += "Unhandled: " + str(remainder) + " (" + str(remainder / arrival_count)[0:6] + "%)"
-    print(arrival_message)
+    output_file.write(arrival_message + "\n")
 
-    print()
+    output_file.write("\n")
 
-    print("# Session Stats")
-    print("Last time: " + last_time)
-    print("Go arounds: " + str(go_arounds))
+    output_file.write("# Session Stats\n")
+    output_file.write("Last time: " + last_time + "\n")
+    output_file.write("Go arounds: " + str(go_arounds) + "\n")
+    output_file.write("\n")
+    output_file.write("Total Runtime (ms): " + str((time.time() - initialtime) * 1000)[:6] + "\n")
